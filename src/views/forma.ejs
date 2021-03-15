@@ -1,0 +1,227 @@
+<h1>Тестовое задание</h1>
+
+<div class="main">
+
+</div>
+
+<script>
+
+  var formFile = function (mainElement, lablebtn, multiple = false) {
+
+    if (mainElement.length === 1) {
+      this.mainElement = mainElement[0];
+    } else {
+      throw Error('Only one object can be used');
+    }
+
+    var divListFile = document.createElement('div');
+    divListFile.className = 'list-files';
+
+    var btn = document.createElement('label');
+    btn.className = 'label';
+
+    var img = document.createElement('img');
+    img.setAttribute('src', './clip.svg');
+    img.setAttribute('alt', lablebtn);
+    btn.appendChild(img);
+
+    var input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('class', 'field-file');
+    if (multiple) input.setAttribute('multiple', 'multiple');
+    btn.appendChild(input);
+
+    var span = document.createElement('span');
+    span.setAttribute('class', 'lable-btn');
+    span.innerText = lablebtn;
+    btn.appendChild(span);
+
+
+    var divForm = document.createElement('div');
+    divForm.className = 'form';
+    divForm.appendChild(btn);
+    divForm.appendChild(divListFile);
+
+    this.mainElement.appendChild(divForm);
+
+    this.onbtnSelectFile;
+
+    this.onClickCloseX;
+
+    this.onClickOpenFIle;
+
+    var _self = this;
+
+    input.addEventListener('change', function () {
+      let data = new FormData();
+      if (multiple) {
+        let itemcnt = 0;
+        for (let index = 0; index < this.files.length; index++) {
+          if (_self.ItemAdd(this.files[index].name)) {
+            data.append('file-' + index, this.files[index]);
+            itemcnt++;
+          }
+        }
+        if (_self.onbtnSelectFile && itemcnt > 0) _self.onbtnSelectFile(data);
+      } else {
+        let oldname = divListFile.querySelectorAll(`div[class=text]`);
+        for (let index = 0; index < this.files.length; index++) {
+          data.append('file-' + index, this.files[index]);
+          _self.ItemUpdate(this.files[index].name);
+        }
+        if (_self.onbtnSelectFile) _self.onbtnSelectFile(data, oldname.length > 0 ? oldname[0].innerText : undefined);
+      }
+
+      this.value = '';
+    });
+
+    this.on = (event, fn) => {
+      this[event] = fn;
+    };
+
+
+    var createItem = (name) => {
+
+      let divItem = document.createElement('div');
+      divItem.className = 'item';
+
+      let divText = document.createElement('div');
+      divText.className = 'text';
+      divText.innerText = name;
+      divText.addEventListener('click', function () {
+        if (_self.onClickOpenFIle) _self.onClickOpenFIle(this, name, divItem);
+      });
+      divItem.appendChild(divText);
+
+      let divX = document.createElement('div');
+      divX.className = 'x';
+      divX.addEventListener('click', function () {
+        if (_self.onClickCloseX) _self.onClickCloseX(this, name, divItem);
+        var Semicolon = divItem.previousElementSibling;
+        if (Semicolon) {
+          Semicolon.remove();
+        } else {
+          Semicolon = divItem.nextElementSibling;
+          if (Semicolon) Semicolon.remove();
+        }
+        divItem.remove();
+      });
+      divItem.appendChild(divX);
+
+      return divItem;
+    }
+
+    var createSemicolon = () => {
+      let Semicolon = document.createElement('div');
+      Semicolon.innerText = ';';
+      return Semicolon;
+    }
+
+    var appendItem = (name) => {
+      var items = divListFile.getElementsByClassName('item');
+      if (items.length > 0) {
+        divListFile.appendChild(createSemicolon());
+      }
+      divListFile.appendChild(createItem(name));
+
+    }
+
+    this.ClearFiles = () => {
+      divListFile.innerHTML = '';
+    }
+
+    this.ItemAdd = (name) => {
+      var items = Array.from(divListFile.querySelectorAll(`div[class=text]`)).find(el => el.innerText === name);
+      if (items === undefined) {
+        appendItem(name);
+        return true
+      }
+      return false;
+    }
+
+    this.ItemUpdate = (name) => {
+      this.ClearFiles()
+      appendItem(name);
+    }
+
+    this.init = (arrItem) => {
+      this.ClearFiles();
+      for (let index = 0; index < arrItem.length; index++) {
+        appendItem(arrItem[index]);
+      }
+    }
+
+
+  }
+
+</script>
+<script>
+  //  document.addEventListener('DOMContentLoaded', function(){});
+
+  var sendQuery = async (url, type, data) => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open(type, url);
+      xhr.onload = () => resolve(xhr.responseText);
+      xhr.onerror = () => reject(xhr.statusText);
+      xhr.send(data);
+    })
+  }
+
+  var multi = new formFile(document.getElementsByClassName('main'), 'Выбрать файлы', true);
+
+  sendQuery(`/api/multi/fiels`, 'GET').then(r => {
+    var res = JSON.parse(r);
+    multi.init(res.fiels);
+  }).catch(function (err) { console.error(err); });
+
+
+  multi.on('onbtnSelectFile', function (data) {
+    sendQuery('/api/multi/fiels', 'POST', data).catch(function (err) {
+      console.error(err);
+    });
+  })
+
+  multi.on('onClickCloseX', function (e, n) {
+    sendQuery(`/api/multi/fiels/${n}`, 'DELETE').catch(function (err) {
+      console.error(err);
+    });
+  })
+
+  multi.on('onClickOpenFIle', function (e) {
+    let win = window.open(`/api/multi/fiels/${e.innerText}`, '_blank');
+  })
+
+
+  var one = new formFile(document.getElementsByClassName('main'), 'Выбрать файл', false);
+
+  sendQuery(`/api/one/fiels`, 'GET').then(r => {
+    var res = JSON.parse(r);
+    one.init(res.fiels);
+  }).catch(function (err) { console.error(err); });
+
+
+  one.on('onbtnSelectFile', function (data, oldname) {
+    if (oldname) {
+      sendQuery(`/api/one/fiels/${oldname}`, 'PUT', data).catch(function (err) {
+        console.error(err);
+      });
+    } else {
+      sendQuery('/api/one/fiels', 'POST', data).catch(function (err) {
+        console.error(err);
+      });
+    }
+
+  })
+
+  one.on('onClickCloseX', function (e, n) {
+    sendQuery(`/api/one/fiels/${n}`, 'DELETE').catch(function (err) {
+      console.error(err);
+    });
+  })
+
+  one.on('onClickOpenFIle', function (e) {
+    let win = window.open(`/api/one/fiels/${e.innerText}`, '_blank');
+  })
+
+</script>

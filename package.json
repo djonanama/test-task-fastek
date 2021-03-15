@@ -1,0 +1,26 @@
+{
+  "name": "form-load-files",
+  "version": "1.0.0",
+  "private": true,
+  "description": "test task",
+  "repository": "https://github.com/djonanama/test-task-fastek.git",
+  "author": "Pavlov E.A.",
+  "license": "MIT",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "yarn && nodemon src/server.js",
+    "start": "yarn && node src/server.js"
+  },
+  "keywords": [],
+  "dependencies": {
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "express-layout": "^0.1.0",
+    "connect-busboy": "^0.0.2",
+    "multer": "^1.3.0",
+    "mime":"^2.5.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.14.11"
+  }
+}

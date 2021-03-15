@@ -1,0 +1,93 @@
+html {
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  margin: 0;
+  background: #fff;
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+}
+
+.main {
+  width:80%;
+}
+.form-group{
+  padding:1em;
+  margin:1em;
+  text-align: center;
+}
+.field-file{
+  outline:0;
+  opacity:0;
+  pointer-events:none;
+  user-select:none;
+  display:none;
+}
+.label{
+  margin: 25px;
+  border:2px dashed grey;
+  border-radius:5px;
+  padding:1.2em;
+  cursor:pointer;
+  display: inline-block;
+  vertical-align:middle;
+}
+.label:hover{
+  border:2px solid #000
+}
+.label:hover i,.label:hover .title{
+  color:#000
+}
+.label img{
+  width:18px;
+}
+
+.lable-btn {
+  text-transform: uppercase;
+  width: 100%;
+  margin: 0 auto;
+  font-size: 20px;
+}
+
+.list-files {
+  min-height: 25px;
+  height: auto;
+  border: 1px solid #c7c7c7;
+  border-radius: 3px 3px 3px 3px;
+  flex-wrap:wrap;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  justify-content: flex-start;
+  align-content: baseline;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: start;
+}
+div.item {
+  background-color: var(--multi-input-item-bg-color, #dedede);
+  border-radius: 2px;
+  color: #222;
+  display: inline-block;
+  font-size: var(--multi-input-item-font-size, 14px);
+  margin: 5px;
+  cursor: pointer;
+  padding: 2px 25px 2px 5px;
+  position: relative;
+}
+div.x::after {
+  color: black;
+  content: '×';
+  cursor: pointer;
+  display: inline-block;
+  font-size: 18px;
+  pointer-events: auto;
+  position: absolute;
+  right: 5px;
+  top:0;
+}
+
